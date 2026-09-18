@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Container List View -->
+    <record model="ir.ui.view" id="import_container_list">
+      <field name="name">import.container.list</field>
+      <field name="model">import.container</field>
+      <field name="arch" type="xml">
+        <list string="Import Containers">
+          <field name="name"/>
+          <field name="container_type"/>
+          <field name="shipment_id"/>
+          <field name="weight"/>
+          <field name="status"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- Container Form View -->
+    <record model="ir.ui.view" id="import_container_form">
+      <field name="name">import.container.form</field>
+      <field name="model">import.container</field>
+      <field name="arch" type="xml">
+        <form string="Import Container">
+          <header>
+            <button name="action_load" string="Load" type="object" class="btn-primary" invisible="status != 'draft'"/>
+            <button name="action_unload" string="Unload" type="object" class="btn-primary" invisible="status != 'loaded'"/>
+          </header>
+          <sheet>
+            <div class="oe_title">
+              <label for="name"/>
+              <h1>
+                <field name="name" readonly="1"/>
+              </h1>
+            </div>
+            <group>
+              <group>
+                <field name="container_type"/>
+                <field name="seal_number"/>
+                <field name="weight"/>
+                <field name="volume"/>
+              </group>
+              <group>
+                <field name="shipment_id"/>
+                <field name="loading_date"/>
+                <field name="unloading_date"/>
+                <field name="status"/>
+              </group>
+            </group>
+            <group string="Stock Integration">
+              <group>
+                <field name="stock_picking_id"/>
+                <field name="purchase_order_line_id"/>
+              </group>
+              <group>
+                <field name="product_id"/>
+                <field name="quantity"/>
+              </group>
+            </group>
+            <group string="Allocation Summary">
+              <group>
+                <field name="total_weight"/>
+                <field name="total_volume"/>
+              </group>
+              <group>
+                <field name="total_value"/>
+              </group>
+            </group>
+            <group>
+              <field name="notes"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- Container Search View -->
+    <record model="ir.ui.view" id="import_container_search">
+      <field name="name">import.container.search</field>
+      <field name="model">import.container</field>
+      <field name="arch" type="xml">
+        <search string="Import Containers">
+          <field name="shipment_id"/>
+          <field name="container_type"/>
+          <field name="status"/>
+          <filter string="Draft" name="draft" domain="[('status','=','draft')]"/>
+          <filter string="Loaded" name="loaded" domain="[('status','=','loaded')]"/>
+          <filter string="In Transit" name="in_transit" domain="[('status','=','in_transit')]"/>
+          <filter string="Arrived" name="arrived" domain="[('status','=','arrived')]"/>
+          <group expand="0" string="Group By">
+            <filter name="group_type" string="Type" context="{'group_by':'container_type'}"/>
+            <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
+            <filter name="group_shipment" string="Shipment" context="{'group_by':'shipment_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Container Action -->
+    <record model="ir.actions.act_window" id="action_import_container">
+      <field name="name">Containers</field>
+      <field name="res_model">import.container</field>
+      <field name="view_mode">list,form</field>
+      <field name="search_view_id" ref="import_container_search"/>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Create your first container!
+        </p>
+      </field>
+    </record>
+  </data>
+</odoo>

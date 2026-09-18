@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu -->
+    <menuitem
+        id="menu_import_root"
+        name="Import Management"
+        sequence="10"
+    />
+
+    <!-- Shipments Submenu -->
+    <menuitem
+        id="menu_import_shipments"
+        name="Shipments"
+        parent="menu_import_root"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_import_shipment_list"
+        name="Import Shipments"
+        parent="menu_import_shipments"
+        action="action_import_shipment"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_import_containers"
+        name="Containers"
+        parent="menu_import_shipments"
+        action="action_import_container"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_import_shipping"
+        name="Shipping Lines"
+        parent="menu_import_shipments"
+        action="action_import_shipping"
+        sequence="30"
+    />
+
+    <menuitem
+        id="menu_import_documents"
+        name="Documents"
+        parent="menu_import_shipments"
+        action="action_import_document"
+        sequence="40"
+    />
+
+</odoo>

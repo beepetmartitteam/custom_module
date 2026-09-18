@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_import_shipment_user,import.shipment.user,model_import_shipment,,1,1,1,0
+access_import_shipment_manager,import.shipment.manager,model_import_shipment,,1,1,1,1
+access_import_container_user,import.container.user,model_import_container,,1,1,1,0
+access_import_container_manager,import.container.manager,model_import_container,,1,1,1,1
+access_import_shipping_user,import.shipping.user,model_import_shipping,,1,1,1,0
+access_import_shipping_manager,import.shipping.manager,model_import_shipping,,1,1,1,1
+access_import_document_user,import.document.user,model_import_document,,1,1,1,0
+access_import_document_manager,import.document.manager,model_import_document,,1,1,1,1
+access_landed_cost_type_user,landed.cost.type.user,model_landed_cost_type,,1,1,1,0
+access_landed_cost_type_manager,landed.cost.type.manager,model_landed_cost_type,,1,1,1,1

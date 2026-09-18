@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.log
+*.swp
+*.swo
+.DS_Store
+
+.idea/
+.vscode/
+
+venv/
+.env
+
+*.zip
+*.tar
+*.tar.gz

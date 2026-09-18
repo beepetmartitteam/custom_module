@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_import_shipment_tree" model="ir.ui.view">
+        <field name="name">import.shipment.tree</field>
+        <field name="model">import.shipment</field>
+        <field name="arch" type="xml">
+
+            <list string="Import Shipments">
+                <field name="name"/>
+                <field name="shipment_date"/>
+                <field name="supplier_id"/>
+                <field name="origin_country"/>
+                <field name="destination"/>
+                <field name="total_containers"/>
+                <field name="total_weight"/>
+                <field name="estimated_arrival"/>
+                <field name="state" widget="badge"/>
+            </list>
+
+        </field>
+    </record>
+
+
+    <record id="view_import_shipment_form" model="ir.ui.view">
+        <field name="name">import.shipment.form</field>
+        <field name="model">import.shipment</field>
+        <field name="arch" type="xml">
+
+            <form string="Import Shipment">
+
+                <header>
+
+                    <button
+                        name="action_confirm"
+                        string="Confirm"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'draft'"
+                    />
+
+                    <button
+                        name="action_in_transit"
+                        string="In Transit"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'confirmed'"
+                    />
+
+                    <button
+                        name="action_arrived"
+                        string="Arrived"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'in_transit'"
+                    />
+
+                    <button
+                        name="action_received"
+                        string="Received"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'arrived'"
+                    />
+
+                    <button
+                        name="action_done"
+                        string="Done"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'received'"
+                    />
+
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        type="object"
+                        invisible="state in ('done', 'cancelled')"
+                    />
+
+                    <button
+                        name="action_reset_draft"
+                        string="Reset to Draft"
+                        type="object"
+                        invisible="state != 'cancelled'"
+                    />
+
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,confirmed,in_transit,arrived,received,done"
+                    />
+
+                </header>
+
+                <sheet>
+
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+
+                        <group string="Shipment Information">
+
+                            <field name="shipment_date"/>
+                            <field name="supplier_id"/>
+                            <field name="purchase_order_id"/>
+
+                        </group>
+
+                        <group string="Destination">
+
+                            <field name="origin_country"/>
+                            <field name="destination"/>
+
+                        </group>
+
+                    </group>
+
+                    <group string="Shipment Summary">
+                        <group>
+                            <field name="total_containers"/>
+                            <field name="total_weight"/>
+                        </group>
+                        <group>
+                            <field name="estimated_arrival"/>
+                            <field name="total_landed_cost"/>
+                        </group>
+                    </group>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_landed_costs" icon="fa-money">
+                            <field name="landed_cost_count" widget="statinfo" string="Landed Costs"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_create_landed_cost" icon="fa-plus-circle">
+                            <span string="Create Landed Cost"/>
+                        </button>
+                    </div>
+
+                    <notebook>
+
+                        <page string="Containers">
+                            <field name="container_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="container_type"/>
+                                    <field name="weight"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Shipping Lines">
+                            <field name="shipping_ids">
+                                <list>
+                                    <field name="shipping_line"/>
+                                    <field name="vessel_name"/>
+                                    <field name="voyage_number"/>
+                                    <field name="etd"/>
+                                    <field name="eta"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Documents">
+                            <field name="document_ids">
+                                <list>
+                                    <field name="document_type"/>
+                                    <field name="document_number"/>
+                                    <field name="document_date"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <record id="view_import_shipment_search" model="ir.ui.view">
+        <field name="name">import.shipment.search</field>
+        <field name="model">import.shipment</field>
+        <field name="arch" type="xml">
+
+            <search string="Import Shipments">
+
+                <field name="supplier_id"/>
+                <field name="state"/>
+                <field name="shipment_date"/>
+
+                <filter
+                    name="draft"
+                    string="Draft"
+                    domain="[('state', '=', 'draft')]"
+                />
+
+                <filter
+                    name="in_transit"
+                    string="In Transit"
+                    domain="[('state', '=', 'in_transit')]"
+                />
+
+                <filter
+                    name="arrived"
+                    string="Arrived"
+                    domain="[('state', '=', 'arrived')]"
+                />
+
+                <group expand="0" string="Group By">
+
+                    <filter
+                        name="group_supplier"
+                        string="Supplier"
+                        context="{'group_by': 'supplier_id'}"
+                    />
+
+                    <filter
+                        name="group_state"
+                        string="Status"
+                        context="{'group_by': 'state'}"
+                    />
+
+                </group>
+
+            </search>
+
+        </field>
+    </record>
+
+
+    <record id="action_import_shipment" model="ir.actions.act_window">
+        <field name="name">Import Shipments</field>
+        <field name="res_model">import.shipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="view_import_shipment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Import Shipment
+            </p>
+        </field>
+    </record>
+
+</odoo>

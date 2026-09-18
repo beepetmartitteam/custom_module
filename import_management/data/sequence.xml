@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_import_shipment" model="ir.sequence">
+        <field name="name">Import Shipment</field>
+        <field name="code">import.shipment</field>
+        <field name="prefix">IMP/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_import_container" model="ir.sequence">
+        <field name="name">Import Container</field>
+        <field name="code">import.container</field>
+        <field name="prefix">CTR/</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_import_shipping" model="ir.sequence">
+        <field name="name">Import Shipping</field>
+        <field name="code">import.shipping</field>
+        <field name="prefix">SHP/</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_import_document" model="ir.sequence">
+        <field name="name">Import Document</field>
+        <field name="code">import.document</field>
+        <field name="prefix">DOC/</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

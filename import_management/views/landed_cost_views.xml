@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stock Landed Cost Form Extension -->
+        <record id="view_stock_landed_cost_form_inherit" model="ir.ui.view">
+            <field name="name">stock.landed.cost.form.inherit</field>
+            <field name="model">stock.landed.cost</field>
+            <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='picking_ids']" position="after">
+                    <field name="import_shipment_id"/>
+                    <field name="import_container_ids" widget="many2many_tags"/>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Import Allocation">
+                        <group>
+                            <field name="auto_allocate"/>
+                            <field name="allocation_method" invisible="not auto_allocate"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Purchase Order Form Extension -->
+        <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_view_import_shipments" icon="fa-ship" invisible="not import_shipment_count">
+                        <field name="import_shipment_count" widget="statinfo" string="Import Shipments"/>
+                    </button>
+                </xpath>
+                <xpath expr="//button[@name='button_cancel']" position="before">
+                    <button name="action_create_import_shipment" string="Create Import Shipment" type="object" class="btn-secondary" invisible="state not in ['purchase', 'done']"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Purchase Order Line Tree Extension -->
+        <record id="view_purchase_order_line_tree_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.line.tree.inherit</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_qty']" position="after">
+                    <field name="shipped_qty"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Landed Cost Type Views -->
+        <record id="view_landed_cost_type_tree" model="ir.ui.view">
+            <field name="name">landed.cost.type.tree</field>
+            <field name="model">landed.cost.type</field>
+            <field name="arch" type="xml">
+                <list string="Landed Cost Types">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_landed_cost_type_form" model="ir.ui.view">
+            <field name="name">landed.cost.type.form</field>
+            <field name="model">landed.cost.type</field>
+            <field name="arch" type="xml">
+                <form string="Landed Cost Type">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="code"/>
+                                <field name="sequence"/>
+                            </group>
+                            <group>
+                                <field name="active"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_landed_cost_type" model="ir.actions.act_window">
+            <field name="name">Landed Cost Types</field>
+            <field name="res_model">landed.cost.type</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem id="menu_landed_cost_type" name="Landed Cost Types" parent="stock.menu_stock_config_settings" action="action_landed_cost_type" sequence="10"/>
+    </data>
+</odoo>
