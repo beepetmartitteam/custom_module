@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_order_form_custom" model="ir.ui.view">
+        <field name="name">purchase.order.form.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- =========================================================
+                 OTHER INFORMATION
+                 Add custom purchase information
+                 ========================================================= -->
+
+            <xpath expr="//page[@name='purchase_delivery_invoice']"
+                   position="inside">
+
+                <group string="Purchase Information">
+
+                    <group>
+                        <field name="purchase_type"/>
+                        <field name="payment_method"/>
+                        <field name="purchase_purpose"/>
+                        <field name="department_id"
+                               options="{'no_create': False}"/>
+                        <field name="project_id"
+                               options="{'no_create': False}"/>
+                    </group>
+
+                    <group string="Import Information"
+                           invisible="purchase_type != 'import'">
+
+                        <field name="country_origin_id"/>
+                        <field name="port_loading"/>
+                        <field name="port_discharge"/>
+                        <field name="incoterm_id"/>
+
+                    </group>
+
+                </group>
+
+            </xpath>
+
+
+            <!-- =========================================================
+                 ESTIMATED ADDITIONAL COSTS
+                 New tab after Other Information
+                 ========================================================= -->
+
+            <xpath expr="//page[@name='purchase_delivery_invoice']"
+                   position="after">
+
+                <page
+                    name="estimated_additional_costs"
+                    string="Estimated Additional Costs">
+
+                    <field
+                        name="estimated_cost_line_ids"
+                        context="{'default_vendor_id': partner_id}">
+
+                        <list editable="bottom">
+
+                            <field name="sequence"
+                                   widget="handle"
+                                   column_invisible="1"/>
+
+                            <field name="cost_type_id"/>
+
+                            <field name="description"/>
+
+                            <field name="vendor_id"/>
+
+                            <field name="currency_id"/>
+
+                            <field name="estimated_amount"/>
+
+                            <field name="exchange_rate"/>
+
+                            <field
+                                name="amount_company_currency"
+                                readonly="1"/>
+
+                            <field name="note"/>
+
+                        </list>
+
+                        <form string="Estimated Additional Cost">
+
+                            <sheet>
+
+                                <group>
+
+                                    <group>
+                                        <field name="cost_type_id"/>
+                                        <field name="description"/>
+                                        <field name="vendor_id"/>
+                                    </group>
+
+                                    <group>
+                                        <field name="currency_id"/>
+                                        <field name="estimated_amount"/>
+                                        <field name="exchange_rate"/>
+                                        <field
+                                            name="amount_company_currency"
+                                            readonly="1"/>
+                                    </group>
+
+                                </group>
+
+                                <group>
+                                    <field name="note"/>
+                                </group>
+
+                            </sheet>
+
+                        </form>
+
+                    </field>
+
+
+                    <!-- TOTAL -->
+
+                    <group class="oe_subtotal_footer">
+
+                        <field
+                            name="estimated_additional_cost"
+                            readonly="1"/>
+
+                        <field
+                            name="estimated_total_cost"
+                            readonly="1"
+                            class="oe_subtotal"/>
+
+                    </group>
+
+                </page>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="purchase_cost_type_freight" 
+model="purchase.cost.type">
+        <field name="name">Freight</field>
+        <field name="code">FREIGHT</field>
+        <field name="sequence">10</field>
+        <field 
+name="allow_import">True</field>
+        <field 
+name="allow_local">False</field>
+    </record>
+
+    <record id="purchase_cost_type_insurance" 
+model="purchase.cost.type">
+        <field name="name">Insurance</field>
+        <field name="code">INSURANCE</field>
+        <field name="sequence">20</field>
+        <field 
+name="allow_import">True</field>
+        <field 
+name="allow_local">False</field>
+    </record>
+
+    <record 
+id="purchase_cost_type_import_duty" 
+model="purchase.cost.type">
+        <field name="name">Import Duty</field>
+        <field name="code">DUTY</field>
+        <field name="sequence">30</field>
+        <field 
+name="allow_import">True</field>
+        <field 
+name="allow_local">False</field>
+    </record>
+
+    <record id="purchase_cost_type_import_tax" 
+model="purchase.cost.type">
+        <field name="name">Import Tax</field>
+        <field name="code">TAX</field>
+        <field name="sequence">40</field>
+        <field 
+name="allow_import">True</field>
+        <field 
+name="allow_local">False</field>
+    </record>
+
+    <record 
+id="purchase_cost_type_port_handling" 
+model="purchase.cost.type">
+        <field name="name">Port 
+Handling</field>
+        <field name="code">HANDLING</field>
+        <field name="sequence">50</field>
+        <field 
+name="allow_import">True</field>
+        <field name="allow_local">True</field>
+    </record>
+
+    <record id="purchase_cost_type_trucking" 
+model="purchase.cost.type">
+        <field name="name">Trucking</field>
+        <field name="code">TRUCKING</field>
+        <field name="sequence">60</field>
+        <field 
+name="allow_import">True</field>
+        <field name="allow_local">True</field>
+    </record>
+
+    <record id="purchase_cost_type_warehouse" 
+model="purchase.cost.type">
+        <field name="name">Warehouse / 
+Storage</field>
+        <field name="code">STORAGE</field>
+        <field name="sequence">70</field>
+        <field 
+name="allow_import">True</field>
+        <field name="allow_local">True</field>
+    </record>
+
+    <record id="purchase_cost_type_forwarder" 
+model="purchase.cost.type">
+        <field name="name">Forwarder</field>
+        <field name="code">FORWARDER</field>
+        <field name="sequence">80</field>
+        <field 
+name="allow_import">True</field>
+        <field 
+name="allow_local">False</field>
+    </record>
+
+    <record id="purchase_cost_type_other" 
+model="purchase.cost.type">
+        <field name="name">Other</field>
+        <field name="code">OTHER</field>
+        <field name="sequence">90</field>
+        <field 
+name="allow_import">True</field>
+        <field name="allow_local">True</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_cost_type_user,purchase.cost.type.user,model_purchase_cost_type,purchase.group_purchase_user,1,0,0,0
+access_purchase_cost_type_manager,purchase.cost.type.manager,model_purchase_cost_type,purchase.group_purchase_manager,1,1,1,1
+access_purchase_order_cost_line_user,purchase.order.cost.line.user,model_purchase_order_cost_line,purchase.group_purchase_user,1,1,1,0
+access_purchase_order_cost_line_manager,purchase.order.cost.line.manager,model_purchase_order_cost_line,purchase.group_purchase_manager,1,1,1,1

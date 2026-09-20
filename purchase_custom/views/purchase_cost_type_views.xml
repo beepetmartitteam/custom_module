@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_purchase_cost_type_list" 
+model="ir.ui.view">
+        <field 
+name="name">purchase.cost.type.list</field>
+        <field 
+name="model">purchase.cost.type</field>
+        <field name="arch" type="xml">
+            <list string="Purchase Cost 
+Types">
+                <field name="sequence" 
+widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="allow_local"/>
+                <field name="allow_import"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_purchase_cost_type_form" 
+model="ir.ui.view">
+        <field 
+name="name">purchase.cost.type.form</field>
+        <field 
+name="model">purchase.cost.type</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Cost Type">
+                <sheet>
+                    <group>
+                        <group>
+                            <field 
+name="name"/>
+                            <field 
+name="code"/>
+                            <field 
+name="sequence"/>
+                            <field 
+name="active"/>
+                        </group>
+
+                        <group>
+                            <field 
+name="allow_local"/>
+                            <field 
+name="allow_import"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field 
+name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_purchase_cost_type" 
+model="ir.actions.act_window">
+        <field name="name">Additional Cost 
+Types</field>
+        <field 
+name="res_model">purchase.cost.type</field>
+        <field 
+name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_purchase_cost_type"
+        name="Additional Cost Types"
+        parent="purchase.menu_purchase_config"
+        action="action_purchase_cost_type"
+        sequence="50"
+        
+groups="purchase.group_purchase_manager"
+    />
+
+</odoo>
