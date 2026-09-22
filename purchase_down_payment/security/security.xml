@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =========================================================
+         PURCHASE DOWN PAYMENT USER
+    ========================================================== -->
+
+    <record id="group_purchase_down_payment_user" model="res.groups">
+
+        <field name="name">
+            Purchase Down Payment User
+        </field>
+
+        <field name="category_id"
+               ref="base.module_category_purchase_management"/>
+
+        <!--
+            User otomatis mendapatkan hak Purchase User.
+        -->
+        <field name="implied_ids"
+               eval="[(4, ref('purchase.group_purchase_user'))]"/>
+
+    </record>
+
+
+    <!-- =========================================================
+         PURCHASE DOWN PAYMENT MANAGER
+    ========================================================== -->
+
+    <record id="group_purchase_down_payment_manager" model="res.groups">
+
+        <field name="name">
+            Purchase Down Payment Manager
+        </field>
+
+        <field name="category_id"
+               ref="base.module_category_purchase_management"/>
+
+        <!--
+            Manager otomatis mendapatkan hak
+            Purchase Down Payment User.
+        -->
+        <field name="implied_ids"
+               eval="[(4, ref('group_purchase_down_payment_user'))]"/>
+
+    </record>
+
+
+    <!-- =========================================================
+         PURCHASE MANAGER
+         Automatically gets Purchase Down Payment Manager
+    ========================================================== -->
+
+    <record id="purchase.group_purchase_manager" model="res.groups">
+
+        <field name="implied_ids"
+               eval="[(4, ref('group_purchase_down_payment_manager'))]"/>
+
+    </record>
+
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record
+        id="res_config_settings_view_form_purchase_down_payment"
+        model="ir.ui.view"
+    >
+
+        <field name="name">
+            res.config.settings.view.form.purchase.down.payment
+        </field>
+
+        <field name="model">
+            res.config.settings
+        </field>
+
+        <field name="priority" eval="30"/>
+
+        <field
+            name="inherit_id"
+            ref="base.res_config_settings_view_form"
+        />
+
+        <field name="arch" type="xml">
+
+            <xpath expr="//form" position="inside">
+
+                <app
+                    data-string="Purchase Down Payment"
+                    string="Purchase Down Payment"
+                    name="purchase_down_payment"
+                    groups="purchase_down_payment.group_purchase_down_payment_manager"
+                >
+
+                    <block
+                        title="Accounting"
+                        name="purchase_down_payment_accounting"
+                    >
+
+                        <setting
+                            string="Purchase Down Payment Account"
+                            help="Account used to record purchase down payments before they are applied to vendor bills."
+                        >
+
+                            <field
+                                name="purchase_down_payment_account_id"
+                            />
+
+                            <div class="text-muted">
+                                Example: Uang Muka Pembelian
+                                / Purchase Advances.
+                            </div>
+
+                        </setting>
+
+                    </block>
+
+                </app>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
+</odoo>

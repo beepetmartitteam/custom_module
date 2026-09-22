@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Supplier Proforma Invoice -->
+    <record id="seq_purchase_proforma" model="ir.sequence">
+        <field name="name">Purchase Proforma Invoice</field>
+        <field name="code">purchase.proforma</field>
+        <field name="prefix">PI/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Down Payment -->
+    <record id="seq_purchase_down_payment" model="ir.sequence">
+        <field name="name">Purchase Down Payment</field>
+        <field name="code">purchase.down.payment</field>
+        <field name="prefix">DP/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

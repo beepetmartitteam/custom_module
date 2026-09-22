@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_purchase_proforma" model="ir.actions.act_window">
+        <field name="name">Purchase Proforma</field>
+        <field name="res_model">purchase.proforma</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_purchase_down_payment" model="ir.actions.act_window">
+        <field name="name">Purchase Down Payments</field>
+        <field name="res_model">purchase.down.payment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_purchase_proforma"
+        name="Purchase Proforma"
+        parent="purchase.menu_procurement_management"
+        action="action_purchase_proforma"
+        sequence="20"
+        groups="purchase_down_payment.group_purchase_down_payment_user"
+    />
+
+    <menuitem
+        id="menu_purchase_down_payment"
+        name="Purchase Down Payments"
+        parent="purchase.menu_procurement_management"
+        action="action_purchase_down_payment"
+        sequence="21"
+        groups="purchase_down_payment.group_purchase_down_payment_user"
+    />
+
+</odoo>

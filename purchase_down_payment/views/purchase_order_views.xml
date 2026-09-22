@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_order_form_down_payment" model="ir.ui.view">
+        <field name="name">purchase.order.form.down.payment</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+
+                <button
+                    name="action_view_proformas"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-file-text-o"
+                >
+                    <field
+                        name="proforma_count"
+                        widget="statinfo"
+                        string="Proformas"
+                    />
+                </button>
+
+                <button
+                    name="action_view_down_payments"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-money"
+                >
+                    <field
+                        name="down_payment_count"
+                        widget="statinfo"
+                        string="Down Payments"
+                    />
+                </button>
+
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+
+                <button
+                    name="action_create_proforma"
+                    type="object"
+                    string="Create Proforma"
+                    class="btn-secondary"
+                    invisible="state in ('cancel', 'done')"
+                />
+
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="res_company_form_purchase_down_payment" model="ir.ui.view">
+        <field name="name">res.company.form.purchase.down.payment</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Purchase Down Payment" name="purchase_down_payment">
+                    <group>
+                        <field name="purchase_down_payment_account_id"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
