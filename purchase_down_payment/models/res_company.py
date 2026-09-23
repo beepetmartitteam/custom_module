@@ -13,3 +13,5 @@ class ResCompany(models.Model):
             'and credited when the down payment is applied to a vendor bill.'
         ),
     )
+
+    

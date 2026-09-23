@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_purchase_down_payment_form" model="ir.ui.view">
+        <field name="name">purchase.down.payment.form</field>
+        <field name="model">purchase.down.payment</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Down Payment">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_register_payment" type="object" string="Register Payment" class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ('paid', 'partially_applied', 'fully_applied', 'cancelled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_applications" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="application_count == 0">
+                            <field name="application_count" widget="statinfo" string="Applications"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="purchase_order_id"/>
+                            <field name="proforma_id"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="company_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="payment_amount"/>
+                        </group>
+                        <group>
+                            <field name="applied_amount"/>
+                            <field name="remaining_amount"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="payment_journal_id" readonly="1"/>
+                            <field name="payment_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_purchase_down_payment_tree" model="ir.ui.view">
+        <field name="name">purchase.down.payment.tree</field>
+        <field name="model">purchase.down.payment</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Down Payments">
+                <field name="name"/>
+                <field name="purchase_order_id"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <field name="payment_amount"/>
+                <field name="remaining_amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

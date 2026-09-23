@@ -1,150 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- =========================================================
-         LIST VIEW
-    ========================================================== -->
-
-    <record id="view_purchase_down_payment_list" model="ir.ui.view">
-        <field name="name">purchase.down.payment.list</field>
-        <field name="model">purchase.down.payment</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="purchase_order_id"/>
-                <field name="proforma_id"/>
-                <field name="partner_id"/>
-                <field name="currency_id"/>
-                <field name="amount"/>
-                <field name="payment_amount"/>
-                <field name="remaining_amount"/>
-                <field name="payment_date"/>
-                <field name="state"/>
-            </list>
-        </field>
-    </record>
-
-
-    <!-- =========================================================
-         FORM VIEW
-    ========================================================== -->
-
-    <record id="view_purchase_down_payment_form" model="ir.ui.view">
-        <field name="name">purchase.down.payment.form</field>
-        <field name="model">purchase.down.payment</field>
-        <field name="arch" type="xml">
-            <form string="Purchase Down Payment">
-                <header>
-                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'confirmed'" groups="purchase_down_payment.group_purchase_down_payment_manager"/>
-                    <button name="action_register_payment" type="object" string="Register Payment" class="btn-primary" invisible="state != 'approved'"/>
-                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ('cancelled', 'paid')"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,approved,paid"/>
-                </header>
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" readonly="1"/>
-                        </h1>
-                    </div>
-                    <group string="Purchase Information">
-                        <group>
-                            <field name="purchase_order_id"/>
-                            <field name="proforma_id"/>
-                            <field name="partner_id"/>
-                        </group>
-                        <group>
-                            <field name="company_id"/>
-                            <field name="currency_id"/>
-                        </group>
-                    </group>
-                    <group string="Down Payment">
-                        <group>
-                            <field name="amount"/>
-                            <field name="payment_amount"/>
-                            <field name="remaining_amount"/>
-                        </group>
-                    </group>
-                    <group string="Payment">
-                        <group>
-                            <field name="payment_date"/>
-                            <field name="payment_journal_id"/>
-                        </group>
-                        <group>
-                            <field name="payment_move_id" readonly="1"/>
-                            <button
-                                name="action_view_payment_move"
-                                type="object"
-                                string="View Journal Entry"
-                                class="btn-link"
-                                icon="fa-external-link"
-                                invisible="not payment_move_id"
-                            />
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Notes">
-                            <field name="notes"/>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-
-    <!-- =========================================================
-         PAYMENT WIZARD
-         Temporarily commented out to fix installation
-    ========================================================== -->
-
     <!--
-    <record id="view_purchase_down_payment_payment_wizard_form" model="ir.ui.view">
-        <field name="name">purchase.down.payment.payment.wizard.form</field>
-        <field name="model">purchase.down.payment.payment.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Register Down Payment">
-                <group>
-                    <field name="down_payment_id" readonly="1"/>
-                    <field name="company_id" invisible="1"/>
-                    <field name="partner_id" readonly="1"/>
-                    <field name="currency_id" readonly="1"/>
-                    <field name="amount"/>
-                    <field name="payment_date"/>
-                    <field name="journal_id"/>
-                    <field name="memo"/>
-                </group>
-                <footer>
-                    <button name="action_create_payment" type="object" string="Register Payment" class="btn-primary"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
-                </footer>
-            </form>
+    <record
+        id="view_purchase_down_payment_payment_wizard_form"
+        model="ir.ui.view"
+    >
+        <field name="name">
+            purchase.down.payment.payment.wizard.form
         </field>
+
+        <field name="model">
+            purchase.down.payment.payment.wizard
+        </field>
+
+        <field name="arch" type="xml">
+
+            <form string="Register Down Payment">
+
+                <group>
+
+                    <group>
+
+                        <field
+                            name="down_payment_id"
+                        />
+
+                        <field
+                            name="partner_id"
+                        />
+
+                        <field
+                            name="company_id"
+                        />
+
+                    </group>
+
+                    <group>
+
+                        <field
+                            name="currency_id"
+                        />
+
+                        <field
+                            name="amount"
+                        />
+
+                        <field
+                            name="payment_date"
+                        />
+
+                    </group>
+
+                </group>
+
+                <group string="Payment">
+
+                    <field
+                        name="journal_id"
+                    />
+
+                    <field
+                        name="memo"
+                    />
+
+                </group>
+
+                <footer>
+
+                    <button
+                        name="action_create_payment"
+                        type="object"
+                        string="Register Payment"
+                        class="btn-primary"
+                    />
+
+                    <button
+                        string="Cancel"
+                        special="cancel"
+                        class="btn-secondary"
+                    />
+
+                </footer>
+
+            </form>
+
+        </field>
+
     </record>
     -->
-
-
-    <!-- =========================================================
-         ACTION
-    ========================================================== -->
-
-    <record id="action_purchase_down_payment" model="ir.actions.act_window">
-        <field name="name">Purchase Down Payments</field>
-        <field name="res_model">purchase.down.payment</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
-
-    <!-- =========================================================
-         MENU
-    ========================================================== -->
-
-    <menuitem
-        id="menu_purchase_down_payment"
-        name="Down Payments"
-        parent="purchase.menu_purchase_root"
-        action="action_purchase_down_payment"
-        sequence="41"
-    />
 
 </odoo>
