@@ -34,6 +34,12 @@ Phase 1:
         'views/account_move_views.xml',
         'views/menu.xml',
     ],
+    'test': ['tests/test_purchase_down_payment.py'],
+    'assets': {
+        'web.assets_backend': [
+            'purchase_down_payment/static/src/js/purchase_down_payment_form.js',
+        ],
+    },
     'installable': True,
     'application': True,
 }

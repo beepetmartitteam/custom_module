@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class PurchaseDownPaymentApplyWizard(models.TransientModel):
     _name = 'purchase.down.payment.apply.wizard'
-    _description = 'Apply Purchase Down Payment'
+    _description = 'Form  PurchaseDownPaymentApplyWizard Apply Purchase Down Payment'
 
     vendor_bill_id = fields.Many2one(
         'account.move',
@@ -77,55 +77,91 @@ class PurchaseDownPaymentApplyWizard(models.TransientModel):
                 0.0,
             )
 
-    @api.model
-    def default_get(self, fields_list):
-        res = super().default_get(fields_list)
-
-        bill_id = res.get('vendor_bill_id')
-
-        if not bill_id:
-            return res
-
-        bill = self.env['account.move'].browse(bill_id)
-
-        if not bill.exists():
-            return res
-
-        if bill.move_type != 'in_invoice':
-            return res
-
-        domain = [
+    def _available_down_payment_domain(self, bill):
+        return [
             ('partner_id', '=', bill.partner_id.id),
             ('company_id', '=', bill.company_id.id),
             ('currency_id', '=', bill.currency_id.id),
             ('state', 'in', ['paid', 'partially_applied']),
+            ('remaining_amount', '>', 0),
         ]
 
-        dps = self.env['purchase.down.payment'].search(
-            domain,
+    def _down_payment_available_amount(self, down_payment):
+        if down_payment.state == 'approved':
+            return down_payment.amount - down_payment.applied_amount
+        return down_payment.remaining_amount
+
+    def _extract_apply_amounts(self, commands):
+        """Keep user-entered amounts only when the Down Payment is present.
+
+        The web client omits readonly One2many fields on save, so incoming
+        lines often have apply_amount=0 and no down_payment_id.
+        """
+        apply_amounts = {}
+        for command in commands or []:
+            if not isinstance(command, (list, tuple)) or len(command) < 3:
+                continue
+            if command[0] not in (0, 1) or not command[2]:
+                continue
+            down_payment_id = command[2].get('down_payment_id')
+            if down_payment_id and 'apply_amount' in command[2]:
+                apply_amounts[down_payment_id] = command[2]['apply_amount']
+        return apply_amounts
+
+    def _prepare_wizard_lines(self, bill, apply_amounts=None):
+        if not bill or bill.move_type != 'in_invoice':
+            return []
+
+        remaining = max(
+            bill.amount_total - bill.purchase_down_payment_total,
+            0.0,
+        )
+        lines = []
+        down_payments = self.env['purchase.down.payment'].search(
+            self._available_down_payment_domain(bill),
             order='id asc',
         )
 
-        lines = []
-
-        for dp in dps:
-            if dp.remaining_amount <= 0:
+        for down_payment in down_payments:
+            available = self._down_payment_available_amount(down_payment)
+            if available <= 0:
                 continue
 
-            lines.append(
-                (
-                    0,
-                    0,
-                    {
-                        'down_payment_id': dp.id,
-                        'available_amount': dp.remaining_amount,
-                        'apply_amount': 0.0,
-                    },
-                )
+            if apply_amounts is not None and down_payment.id in apply_amounts:
+                apply_amount = apply_amounts[down_payment.id]
+            else:
+                apply_amount = min(available, remaining)
+
+            remaining = max(remaining - apply_amount, 0.0)
+            lines.append((0, 0, {
+                'down_payment_id': down_payment.id,
+                'available_amount': available,
+                'apply_amount': apply_amount,
+            }))
+
+        return lines
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            bill = self.env['account.move'].browse(vals.get('vendor_bill_id'))
+            if not bill.exists():
+                continue
+
+            apply_amounts = self._extract_apply_amounts(vals.get('line_ids'))
+            vals['line_ids'] = self._prepare_wizard_lines(
+                bill,
+                apply_amounts or None,
             )
 
-        res['line_ids'] = lines
+        return super().create(vals_list)
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        bill = self.env['account.move'].browse(res.get('vendor_bill_id'))
+        if bill.exists():
+            res['line_ids'] = self._prepare_wizard_lines(bill)
         return res
 
     def action_apply(self):
@@ -149,7 +185,7 @@ class PurchaseDownPaymentApplyWizard(models.TransientModel):
             )
 
         selected_lines = self.line_ids.filtered(
-            lambda line: line.apply_amount > 0
+            lambda line: line.apply_amount > 0 and line.down_payment_id
         )
 
         if not selected_lines:
@@ -422,7 +458,6 @@ class PurchaseDownPaymentApplyWizardLine(models.TransientModel):
 
     wizard_id = fields.Many2one(
         'purchase.down.payment.apply.wizard',
-        required=True,
         ondelete='cascade',
     )
 

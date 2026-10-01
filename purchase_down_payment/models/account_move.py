@@ -67,7 +67,7 @@ class AccountMove(models.Model):
 
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Apply Purchase Down Payment'),
+            'name': _('Apply Purchase Down Payments'),
             'res_model': 'purchase.down.payment.apply.wizard',
             'view_mode': 'form',
             'target': 'new',

@@ -5,7 +5,7 @@
         <field name="name">purchase.down.payment.form</field>
         <field name="model">purchase.down.payment</field>
         <field name="arch" type="xml">
-            <form string="Purchase Down Payment">
+                    <form string="Purchase Down Payment" js_class="purchase_down_payment_form">
                 <header>
                     <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'confirmed'"/>
@@ -22,8 +22,12 @@
                     <group>
                         <group>
                             <field name="name"/>
-                            <field name="purchase_order_id"/>
-                            <field name="proforma_id"/>
+                            <field name="purchase_order_id" options="{'no_create': True}"/>
+                            <field
+                                name="proforma_id"
+                                domain="[('purchase_order_id', '=?', purchase_order_id)]"
+                                options="{'no_create': True}"
+                            />
                         </group>
                         <group>
                             <field name="partner_id"/>
@@ -59,11 +63,11 @@
         </field>
     </record>
 
-    <record id="view_purchase_down_payment_tree" model="ir.ui.view">
-        <field name="name">purchase.down.payment.tree</field>
+    <record id="view_purchase_down_payment_list" model="ir.ui.view">
+        <field name="name">purchase.down.payment.list</field>
         <field name="model">purchase.down.payment</field>
         <field name="arch" type="xml">
-            <tree string="Purchase Down Payments">
+            <list string="Purchase Down Payments">
                 <field name="name"/>
                 <field name="purchase_order_id"/>
                 <field name="partner_id"/>
@@ -71,7 +75,7 @@
                 <field name="payment_amount"/>
                 <field name="remaining_amount"/>
                 <field name="state"/>
-            </tree>
+            </list>
         </field>
     </record>
 

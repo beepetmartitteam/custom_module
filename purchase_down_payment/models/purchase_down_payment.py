@@ -197,6 +197,65 @@ class PurchaseDownPayment(models.Model):
             record.application_count = len(record.application_ids)
 
     # =========================================================
+    # DEFAULT / ONCHANGE
+    # =========================================================
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        purchase_order_id = (
+            res.get('purchase_order_id')
+            or self.env.context.get('default_purchase_order_id')
+        )
+        if (
+            not purchase_order_id
+            and self.env.context.get('active_model') == 'purchase.order'
+        ):
+            purchase_order_id = self.env.context.get('active_id')
+        if purchase_order_id and 'purchase_order_id' in fields_list:
+            res['purchase_order_id'] = purchase_order_id
+        return res
+
+    @api.onchange('proforma_id')
+    def _onchange_proforma_id(self):
+        if not self.proforma_id:
+            return
+        self.purchase_order_id = self.proforma_id.purchase_order_id
+        if not self.amount:
+            self.amount = self.proforma_id.down_payment_amount
+
+    @api.onchange('purchase_order_id')
+    def _onchange_purchase_order_id(self):
+        if (
+            self.proforma_id
+            and self.purchase_order_id
+            and self.proforma_id.purchase_order_id != self.purchase_order_id
+        ):
+            self.proforma_id = False
+
+    def _vals_with_purchase_order_from_proforma(self, vals):
+        """Keep the Purchase Order aligned with the selected proforma.
+
+        Nested Odoo 18 URLs often omit default_purchase_order_id and may
+        inject the parent PO on save, which can disagree with the proforma.
+        """
+        vals = dict(vals)
+        if vals.get('proforma_id'):
+            proforma = self.env['purchase.proforma'].browse(vals['proforma_id'])
+            if proforma.purchase_order_id:
+                vals['purchase_order_id'] = proforma.purchase_order_id.id
+        elif not vals.get('purchase_order_id'):
+            context_po = self.env.context.get('default_purchase_order_id')
+            if (
+                not context_po
+                and self.env.context.get('active_model') == 'purchase.order'
+            ):
+                context_po = self.env.context.get('active_id')
+            if context_po:
+                vals['purchase_order_id'] = context_po
+        return vals
+
+    # =========================================================
     # CREATE
     # =========================================================
 
@@ -207,12 +266,17 @@ class PurchaseDownPayment(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'purchase.down.payment'
                 ) or _('New')
+            vals.update(self._vals_with_purchase_order_from_proforma(vals))
 
-        records = super().create(vals_list)
+        return super().create(vals_list)
 
-        for record in records:
+    @api.constrains('proforma_id', 'purchase_order_id')
+    def _check_proforma_purchase_order(self):
+        for record in self:
             if (
-                record.proforma_id.purchase_order_id
+                record.proforma_id
+                and record.purchase_order_id
+                and record.proforma_id.purchase_order_id
                 != record.purchase_order_id
             ):
                 raise ValidationError(
@@ -221,8 +285,6 @@ class PurchaseDownPayment(models.Model):
                         'the selected Purchase Order.'
                     )
                 )
-
-        return records
 
     # =========================================================
     # CONFIRM
@@ -329,26 +391,9 @@ class PurchaseDownPayment(models.Model):
                 _('This down payment already has a payment journal entry.')
             )
 
-        if self.remaining_amount > 0:
-            raise UserError(
-                _(
-                    'This down payment already has an available '
-                    'amount for application.'
-                )
-            )
-
         if self.amount <= 0:
             raise UserError(
                 _('There is no amount to pay.')
-            )
-
-        if not self.company_id.purchase_down_payment_account_id:
-            raise UserError(
-                _(
-                    'Purchase Down Payment Account is not configured '
-                    'for company %s.'
-                )
-                % self.company_id.display_name
             )
 
         return {
