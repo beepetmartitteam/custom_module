@@ -1,62 +1,35 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+import logging
 
 
 class PurchaseDownPaymentPaymentWizard(models.TransientModel):
     _name = 'purchase.down.payment.payment.wizard'
     _description = 'Register Purchase Down Payment Payment'
-
-    @api.model
-    def fields_view_get(self, view_id=None, view_type='form', context=None, toolbar=False, submenu=False):
-        """Override to provide the view if not defined in XML"""
-        res = super().fields_view_get(view_id, view_type, context, toolbar, submenu)
-        
-        if view_type == 'form':
-            # Check if the view is properly defined
-            if not res.get('arch') or 'down_payment_id' not in str(res.get('arch', '')):
-                # Provide a default view structure
-                view_arch = '''
-                    <form string="Register Down Payment">
-                        <group>
-                            <group>
-                                <field name="down_payment_id"/>
-                                <field name="partner_id"/>
-                                <field name="company_id"/>
-                            </group>
-                            <group>
-                                <field name="currency_id"/>
-                                <field name="amount"/>
-                                <field name="payment_date"/>
-                            </group>
-                        </group>
-                        <group string="Payment">
-                            <field name="journal_id"/>
-                            <field name="memo"/>
-                        </group>
-                        <footer>
-                            <button name="action_create_payment" type="object" string="Register Payment" class="btn-primary"/>
-                            <button string="Cancel" special="cancel" class="btn-secondary"/>
-                        </footer>
-                    </form>
-                '''
-                res['arch'] = view_arch
-                res['fields'] = {
-                    'down_payment_id': {'type': 'many2one', 'string': 'Down Payment'},
-                    'partner_id': {'type': 'many2one', 'string': 'Vendor'},
-                    'company_id': {'type': 'many2one', 'string': 'Company'},
-                    'currency_id': {'type': 'many2one', 'string': 'Currency'},
-                    'amount': {'type': 'float', 'string': 'Amount'},
-                    'payment_date': {'type': 'date', 'string': 'Payment Date'},
-                    'journal_id': {'type': 'many2one', 'string': 'Journal'},
-                    'memo': {'type': 'char', 'string': 'Memo'},
-                }
-        
-        return res
+    _logger = logging.getLogger(__name__)
 
     def action_create_payment(self):
         self.ensure_one()
 
         dp = self.down_payment_id
+        company = dp.company_id
+        currency = dp.currency_id
+
+        self._logger.info(
+            "=== ACTION CREATE PAYMENT START === "
+            "wizard_id=%s, dp_id=%s, dp_name=%s, "
+            "amount=%s, payment_date=%s, journal_id=%s, "
+            "company_id=%s, company_currency=%s, dp_currency=%s",
+            self.id,
+            dp.id if dp else False,
+            dp.name if dp else False,
+            self.amount,
+            self.payment_date,
+            self.journal_id.id if self.journal_id else False,
+            company.id if company else False,
+            company.currency_id.id if company and company.currency_id else False,
+            currency.id if currency else False,
+        )
 
         if not dp:
             raise UserError(
@@ -65,18 +38,12 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
 
         if dp.state != 'approved':
             raise UserError(
-                _(
-                    'Only approved Down Payments '
-                    'can be paid.'
-                )
+                _('Only approved Down Payments can be paid.')
             )
 
         if dp.payment_move_id:
             raise UserError(
-                _(
-                    'This Down Payment already has '
-                    'a payment journal entry.'
-                )
+                _('This Down Payment already has a payment journal entry.')
             )
 
         if self.amount <= 0:
@@ -99,15 +66,15 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
                 _('Payment Journal is required.')
             )
 
-        if self.journal_id.company_id != dp.company_id:
+        if self.journal_id.company_id != company:
             raise UserError(
                 _(
-                    'Payment Journal must belong '
-                    'to the same company as the Down Payment.'
+                    'Payment Journal must belong to the same company '
+                    'as the Down Payment.'
                 )
             )
 
-        account = dp.company_id.purchase_down_payment_account_id
+        account = company.purchase_down_payment_account_id
 
         if not account:
             raise UserError(
@@ -115,21 +82,19 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
                     'Purchase Down Payment Account is not configured '
                     'for company %s.'
                 )
-                % dp.company_id.display_name
+                % company.display_name
             )
 
-        if account.company_ids and dp.company_id not in account.company_ids:
+        if account.company_ids and company not in account.company_ids:
             raise UserError(
                 _(
                     'Purchase Down Payment Account does not belong '
                     'to company %s.'
                 )
-                % dp.company_id.display_name
+                % company.display_name
             )
 
-        bank_account = (
-            self.journal_id.default_account_id
-        )
+        bank_account = self.journal_id.default_account_id
 
         if not bank_account:
             raise UserError(
@@ -154,6 +119,17 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
             'state': 'paid',
         })
 
+        self._logger.info(
+            "=== ACTION CREATE PAYMENT SUCCESS === "
+            "dp_id=%s, move_id=%s, move_name=%s, "
+            "payment_amount=%s, state=%s",
+            dp.id,
+            move.id,
+            move.name,
+            dp.payment_amount,
+            dp.state,
+        )
+
         return {
             'type': 'ir.actions.act_window_close',
         }
@@ -167,37 +143,103 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
         company = dp.company_id
         currency = dp.currency_id
 
+        payment_amount = self.amount
+
+        is_foreign_currency = currency != company.currency_id
+
+        # Convert DP currency -> company currency
+        company_amount = currency._convert(
+            payment_amount,
+            company.currency_id,
+            company,
+            self.payment_date,
+        )
+
+        self._logger.info(
+            "=== CREATE PAYMENT MOVE === "
+            "dp_id=%s, currency=%s, payment_amount=%s, "
+            "company_currency=%s, company_amount=%s, "
+            "foreign=%s, journal_id=%s, account_id=%s, "
+            "bank_account_id=%s",
+            dp.id,
+            currency.name,
+            payment_amount,
+            company.currency_id.name,
+            company_amount,
+            is_foreign_currency,
+            self.journal_id.id,
+            account.id,
+            bank_account.id,
+        )
+
         move_vals = {
             'move_type': 'entry',
             'date': self.payment_date,
             'journal_id': self.journal_id.id,
             'company_id': company.id,
-            'currency_id': currency.id if currency != company.currency_id else False,
+
+            # WAJIB diisi
+            'currency_id': currency.id,
+
             'ref': _('Down Payment: %s') % dp.name,
+
             'line_ids': [
                 (0, 0, {
                     'account_id': account.id,
                     'name': dp.name,
+
+                    # Company currency
                     'debit': 0.0,
-                    'credit': self.amount,
+                    'credit': company_amount,
+
                     'partner_id': dp.partner_id.id,
-                    'currency_id': currency.id if currency != company.currency_id else False,
-                    'amount_currency': -self.amount if currency != company.currency_id else False,
+
+                    # Transaction currency
+                    'currency_id': currency.id,
+                    'amount_currency': -payment_amount,
                 }),
+
                 (0, 0, {
                     'account_id': bank_account.id,
                     'name': dp.name,
-                    'debit': self.amount,
+
+                    # Company currency
+                    'debit': company_amount,
                     'credit': 0.0,
+
                     'partner_id': dp.partner_id.id,
-                    'currency_id': currency.id if currency != company.currency_id else False,
-                    'amount_currency': self.amount if currency != company.currency_id else False,
+
+                    # Transaction currency
+                    'currency_id': currency.id,
+                    'amount_currency': payment_amount,
                 }),
             ],
         }
 
+        self._logger.info(
+            "PAYMENT MOVE VALS: %s",
+            move_vals,
+        )
+
         move = self.env['account.move'].create(move_vals)
+
+        self._logger.info(
+            "PAYMENT MOVE CREATED: move_id=%s, name=%s, "
+            "currency_id=%s, state=%s",
+            move.id,
+            move.name,
+            move.currency_id.id,
+            move.state,
+        )
+
         move.action_post()
+
+        self._logger.info(
+            "PAYMENT MOVE POSTED: move_id=%s, name=%s, state=%s",
+            move.id,
+            move.name,
+            move.state,
+        )
 
         return move
 
