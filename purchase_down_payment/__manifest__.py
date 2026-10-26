@@ -33,6 +33,7 @@ Phase 1:
         'views/purchase_down_payment_payment_views.xml',
         'views/purchase_down_payment_apply_views.xml',
         'views/account_move_views.xml',
+        'views/res_config_settings_views.xml',
         'views/menu.xml',
     ],
     'test': ['tests/test_purchase_down_payment.py'],

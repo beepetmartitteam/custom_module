@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ===================================================== -->
+    <!-- LIST VIEW                                             -->
+    <!-- ===================================================== -->
+
     <record id="view_purchase_proforma_list" model="ir.ui.view">
         <field name="name">purchase.proforma.list</field>
         <field name="model">purchase.proforma</field>
         <field name="arch" type="xml">
-            <list>
+            <list string="Supplier Proforma Invoices">
                 <field name="name"/>
                 <field name="proforma_number"/>
                 <field name="purchase_order_id"/>
@@ -18,6 +22,10 @@
             </list>
         </field>
     </record>
+
+    <!-- ===================================================== -->
+    <!-- FORM VIEW                                             -->
+    <!-- ===================================================== -->
 
     <record id="view_purchase_proforma_form" model="ir.ui.view">
         <field name="name">purchase.proforma.form</field>
@@ -70,6 +78,10 @@
 
                 <sheet>
 
+                    <!-- Fields used by view expressions -->
+                    <field name="proforma_move_id" invisible="1"/>
+
+                    <!-- Smart buttons -->
                     <div class="oe_button_box" name="button_box">
 
                         <button
@@ -85,29 +97,66 @@
                             />
                         </button>
 
+                        <button
+                            name="action_view_proforma_journal"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-book"
+                            invisible="not proforma_move_id"
+                        >
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">
+                                    Proforma Journal
+                                </span>
+                            </div>
+                        </button>
+
                     </div>
 
+                    <!-- Title -->
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
 
+                    <!-- Main information -->
                     <group>
 
-                        <group>
-                            <field name="purchase_order_id"/>
+                        <group string="Supplier Proforma">
+                            <field
+                                name="purchase_order_id"
+                                readonly="state != 'draft'"
+                            />
                             <field name="partner_id"/>
-                            <field name="proforma_number"/>
-                            <field name="proforma_date"/>
-                            <field name="due_date"/>
+                            <field
+                                name="proforma_number"
+                                readonly="state != 'draft'"
+                            />
+                            <field
+                                name="proforma_date"
+                                readonly="state != 'draft'"
+                            />
+                            <field
+                                name="due_date"
+                                readonly="state != 'draft'"
+                            />
                         </group>
 
-                        <group>
+                        <group string="Amounts">
                             <field name="currency_id"/>
-                            <field name="amount_untaxed"/>
-                            <field name="tax_amount"/>
-                            <field name="amount_total"/>
+                            <field
+                                name="amount_untaxed"
+                                readonly="state != 'draft'"
+                            />
+                            <field
+                                name="tax_amount"
+                                readonly="state != 'draft'"
+                            />
+                            <field
+                                name="amount_total"
+                                readonly="state != 'draft'"
+                            />
                         </group>
 
                     </group>
@@ -115,36 +164,67 @@
                     <notebook>
 
                         <page string="Down Payment">
-
                             <group>
-
-                                <field name="down_payment_percentage"/>
-                                <field name="down_payment_amount"/>
-
+                                <field
+                                    name="down_payment_percentage"
+                                    readonly="state not in ('draft', 'submitted')"
+                                />
+                                <field
+                                    name="down_payment_amount"
+                                    readonly="state not in ('draft', 'submitted')"
+                                />
                             </group>
 
+                            <field
+                                name="down_payment_ids"
+                                readonly="1"
+                            >
+                                <list>
+                                    <field name="name"/>
+                                    <field name="purchase_order_id"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Accounting">
+                            <group>
+                                <field
+                                    name="proforma_move_id"
+                                    readonly="1"
+                                />
+                            </group>
                         </page>
 
                         <page string="Attachments">
-
-                            <field name="attachment_ids"/>
-
+                            <field
+                                name="attachment_ids"
+                                widget="many2many_binary"
+                            />
                         </page>
 
                         <page string="Notes">
-
-                            <field name="notes"/>
-
+                            <field
+                                name="notes"
+                                placeholder="Additional information..."
+                            />
                         </page>
 
                     </notebook>
 
                 </sheet>
 
+                <chatter/>
+
             </form>
 
         </field>
     </record>
+
+    <!-- ===================================================== -->
+    <!-- WINDOW ACTION                                         -->
+    <!-- ===================================================== -->
 
     <record id="action_purchase_proforma" model="ir.actions.act_window">
         <field name="name">Supplier Proforma Invoices</field>
@@ -152,12 +232,17 @@
         <field name="view_mode">list,form</field>
     </record>
 
+    <!-- ===================================================== -->
+    <!-- MENU                                                   -->
+    <!-- ===================================================== -->
+
     <menuitem
         id="menu_purchase_proforma"
         name="Supplier Proforma Invoices"
         parent="purchase.menu_purchase_root"
         action="action_purchase_proforma"
         sequence="40"
+        groups="purchase.group_purchase_user"
     />
 
 </odoo>

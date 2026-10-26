@@ -55,6 +55,8 @@ class PurchaseDownPaymentApplyWizard(models.TransientModel):
         string='Down Payments',
     )
 
+   
+
     @api.depends(
         'vendor_bill_id',
         'vendor_bill_id.amount_total',
@@ -184,8 +186,12 @@ class PurchaseDownPaymentApplyWizard(models.TransientModel):
                 _('Only Vendor Bills can receive Down Payment applications.')
             )
 
+        # selected_lines = self.line_ids.filtered(
+        #     lambda line: line.apply_amount > 0 and line.down_payment_id
+        # )
+
         selected_lines = self.line_ids.filtered(
-            lambda line: line.apply_amount > 0 and line.down_payment_id
+            lambda line: line.selected and line.down_payment_id
         )
 
         if not selected_lines:
@@ -482,6 +488,11 @@ class PurchaseDownPaymentApplyWizardLine(models.TransientModel):
     currency_id = fields.Many2one(
         related='wizard_id.currency_id',
         readonly=True,
+    )
+
+    selected = fields.Boolean(
+        string='Select',
+        default=False,
     )
 
     @api.constrains('apply_amount')

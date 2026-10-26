@@ -5,6 +5,15 @@ from odoo.exceptions import UserError
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    purchase_proforma_id = fields.Many2one(
+        "purchase.proforma",
+        string="Supplier Proforma",
+        readonly=True,
+        copy=False,
+        index=True,
+        ondelete="restrict",
+    )
+
     purchase_down_payment_application_ids = fields.One2many(
         'purchase.down.payment.application',
         'vendor_bill_id',

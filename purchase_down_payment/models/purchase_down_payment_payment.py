@@ -74,26 +74,24 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
                 )
             )
 
-        account = company.purchase_down_payment_account_id
+        account = company.purchase_proforma_payable_account_id
 
         if not account:
             raise UserError(
                 _(
-                    'Purchase Down Payment Account is not configured '
+                    'Proforma Accounts Payable is not configured '
                     'for company %s.'
-                )
-                % company.display_name
+                ) % company.display_name
             )
 
         if account.company_ids and company not in account.company_ids:
             raise UserError(
                 _(
-                    'Purchase Down Payment Account does not belong '
+                    'Proforma Accounts Payable does not belong '
                     'to company %s.'
-                )
-                % company.display_name
-            )
-
+                ) % company.display_name
+        )
+            
         bank_account = self.journal_id.default_account_id
 
         if not bank_account:
@@ -134,15 +132,10 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
             'type': 'ir.actions.act_window_close',
         }
 
-    def _create_payment_move(
-        self,
-        dp,
-        account,
-        bank_account,
-    ):
+
+    def _create_payment_move(self, dp, account, bank_account):
         company = dp.company_id
         currency = dp.currency_id
-
         payment_amount = self.amount
 
         is_foreign_currency = currency != company.currency_id
@@ -177,41 +170,29 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
             'date': self.payment_date,
             'journal_id': self.journal_id.id,
             'company_id': company.id,
-
-            # WAJIB diisi
             'currency_id': currency.id,
-
             'ref': _('Down Payment: %s') % dp.name,
-
             'line_ids': [
+                # DEBIT: Utang Usaha
                 (0, 0, {
                     'account_id': account.id,
                     'name': dp.name,
-
-                    # Company currency
-                    'debit': 0.0,
-                    'credit': company_amount,
-
+                    'debit': company_amount,
+                    'credit': 0.0,
                     'partner_id': dp.partner_id.id,
-
-                    # Transaction currency
                     'currency_id': currency.id,
-                    'amount_currency': -payment_amount,
+                    'amount_currency': payment_amount,
                 }),
 
+                # CREDIT: Bank / Cash
                 (0, 0, {
                     'account_id': bank_account.id,
                     'name': dp.name,
-
-                    # Company currency
-                    'debit': company_amount,
-                    'credit': 0.0,
-
+                    'debit': 0.0,
+                    'credit': company_amount,
                     'partner_id': dp.partner_id.id,
-
-                    # Transaction currency
                     'currency_id': currency.id,
-                    'amount_currency': payment_amount,
+                    'amount_currency': -payment_amount,
                 }),
             ],
         }
@@ -242,6 +223,7 @@ class PurchaseDownPaymentPaymentWizard(models.TransientModel):
         )
 
         return move
+
 
     @api.model
     def default_get(self, fields_list):

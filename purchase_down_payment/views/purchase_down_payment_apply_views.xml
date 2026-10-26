@@ -9,34 +9,50 @@
             <form string="Apply Purchase Down Payment">
                 <group>
                     <group>
-                        <field name="vendor_bill_id"/>
-                        <field name="partner_id"/>
+                        <field name="vendor_bill_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
                     </group>
                     <group>
-                        <field name="currency_id"/>
-                        <field name="bill_amount"/>
+                        <field name="currency_id" readonly="1"/>
+                        <field name="bill_amount" readonly="1"/>
                     </group>
                 </group>
+
                 <group>
                     <group>
-                        <field name="already_applied"/>
+                        <field name="already_applied" readonly="1"/>
                     </group>
                     <group>
-                        <field name="remaining_bill_amount"/>
+                        <field name="remaining_bill_amount" readonly="1"/>
                     </group>
                 </group>
+
                 <separator string="Available Down Payments"/>
+
                 <field name="line_ids" nolabel="1">
                     <list editable="bottom" create="false" delete="false">
-                        <field name="down_payment_id" readonly="1" force_save="1"/>
-                        <field name="available_amount" readonly="1" force_save="1"/>
-                        <field name="apply_amount"/>
-                        <field name="currency_id" column_invisible="True"/>
+                        <field name="selected"/>
+                        <field name="down_payment_id"
+                               string="Down Payment"
+                               readonly="1"
+                               force_save="1"/>
+                        <field name="available_amount"
+                               string="Available / Apply Amount"
+                               readonly="1"
+                               force_save="1"/>
+                        <field name="currency_id"
+                               column_invisible="True"/>
                     </list>
                 </field>
+
                 <footer>
-                    <button name="action_apply" type="object" string="Apply Down Payment" class="btn-primary"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    <button name="action_apply"
+                            type="object"
+                            string="Apply Down Payment"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            special="cancel"
+                            class="btn-secondary"/>
                 </footer>
             </form>
         </field>
@@ -47,11 +63,16 @@
         <field name="name">purchase.down.payment.apply.wizard.line.list</field>
         <field name="model">purchase.down.payment.apply.wizard.line</field>
         <field name="arch" type="xml">
-            <list editable="bottom" create="false">
-                <field name="down_payment_id" readonly="1" force_save="1"/>
-                <field name="available_amount" readonly="1" force_save="1"/>
-                <field name="apply_amount"/>
-                <field name="currency_id" column_invisible="True"/>
+            <list create="false" delete="false">
+                <field name="selected"/>
+                <field name="down_payment_id"
+                       string="Down Payment"
+                       readonly="1"/>
+                <field name="available_amount"
+                       string="Available / Apply Amount"
+                       readonly="1"/>
+                <field name="currency_id"
+                       column_invisible="True"/>
             </list>
         </field>
     </record>

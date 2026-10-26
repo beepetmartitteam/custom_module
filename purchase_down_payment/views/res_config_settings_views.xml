@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record
         id="res_config_settings_view_form_purchase_down_payment"
         model="ir.ui.view"
     >
-
         <field name="name">
             res.config.settings.view.form.purchase.down.payment
         </field>
 
-        <field name="model">
-            res.config.settings
-        </field>
+        <field name="model">res.config.settings</field>
 
         <field name="priority" eval="30"/>
 
@@ -22,7 +18,6 @@
         />
 
         <field name="arch" type="xml">
-
             <xpath expr="//form" position="inside">
 
                 <app
@@ -33,7 +28,44 @@
                 >
 
                     <block
-                        title="Accounting"
+                        title="Proforma Supplier"
+                        name="purchase_proforma_accounting"
+                    >
+
+                        <setting
+                            string="Proforma Journal"
+                            help="Journal used when a Supplier Proforma is verified. Contoh konfigurasi: jurnal DP atau jurnal umum khusus Proforma Supplier"
+                        >
+                            <field
+                                name="purchase_proforma_journal_id"
+                                options="{'no_create': True}"
+                            />
+                        </setting>
+
+                        <setting
+                            string="Purchase Advance Account"
+                            help="Debit account used to record the Supplier Proforma. Contoh akun: Uang Muka Pembelian - Proforma"
+                        >
+                            <field
+                                name="purchase_proforma_advance_account_id"
+                                options="{'no_create': True}"
+                            />
+                        </setting>
+
+                        <setting
+                            string="Accounts Payable"
+                            help="Credit account used to record the Supplier Proforma. Contoh akun: 21100010 - Hutang Usaha"
+                        >
+                            <field
+                                name="purchase_proforma_payable_account_id"
+                                options="{'no_create': True}"
+                            />
+                        </setting>
+
+                    </block>
+
+                    <block
+                        title="Down Payment"
                         name="purchase_down_payment_accounting"
                     >
 
@@ -41,16 +73,15 @@
                             string="Purchase Down Payment Account"
                             help="Account used to record purchase down payments before they are applied to vendor bills."
                         >
-
                             <field
                                 name="purchase_down_payment_account_id"
+                                options="{'no_create': True}"
                             />
 
                             <div class="text-muted">
-                                Example: Uang Muka Pembelian
-                                / Purchase Advances.
+                                Contoh: 11510020 - Uang Muka Pembelian Dibayar/
+                                Purchase Advances.
                             </div>
-
                         </setting>
 
                     </block>
@@ -58,9 +89,6 @@
                 </app>
 
             </xpath>
-
         </field>
-
     </record>
-
 </odoo>
